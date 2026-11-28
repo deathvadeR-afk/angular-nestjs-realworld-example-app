@@ -101,4 +101,22 @@ describe('toArticleDto', () => {
     expect(result.createdAt).toBe('2024-01-01T00:00:00.000Z');
     expect(result.updatedAt).toBe('2024-01-02T00:00:00.000Z');
   });
+
+  it('[QP-SMTURBO-6-1] Marks an article as favorited for the reader who favorited it', () => {
+    const result = toArticleDto(mockArticle, 1, false);
+
+    expect(result.favorited).toBe(true);
+  });
+
+  it('[QP-SMTURBO-6-2] Does not mark an article as favorited for a reader who never favorited it', () => {
+    const result = toArticleDto(mockArticle, 2, false);
+
+    expect(result.favorited).toBe(false);
+  });
+
+  it('[QP-SMTURBO-6-3] Keeps favorited false when no reader is signed in', () => {
+    const result = toArticleDto(mockArticle, undefined, false);
+
+    expect(result.favorited).toBe(false);
+  });
 });

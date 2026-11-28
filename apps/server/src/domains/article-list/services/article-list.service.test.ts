@@ -182,6 +182,48 @@ describe('ArticleListService', () => {
       expect(result.articlesCount).toBe(2);
       expect(mockRepository.isFollowing).toHaveBeenCalledTimes(2);
     });
+
+    it("[QP-SMTURBO-6-4] Gives each article in a signed-in reader's list its own favorited flag", async () => {
+      const query: GetArticlesQueryDto = {
+        offset: 0,
+        limit: 20,
+      };
+      const currentUserId = 1;
+      const articleA = {
+        ...mockArticleWithRelations,
+        id: 1,
+        slug: 'article-a',
+        userId: 1,
+        user: { ...mockArticleWithRelations.user, id: 1 },
+        favorites: [{ userId: 1 }],
+      };
+      const articleB = {
+        ...mockArticleWithRelations,
+        id: 2,
+        slug: 'article-b',
+        userId: 2,
+        user: { ...mockArticleWithRelations.user, id: 2 },
+        favorites: [{ userId: 2 }],
+      };
+
+      mockRepository.getArticles.mockResolvedValue({
+        articles: [articleA, articleB],
+        count: 2,
+      });
+      mockRepository.isFollowing.mockResolvedValue(false);
+      vi.mocked(Presenters.toArticleDto).mockImplementation((article, userId) => ({
+        ...mockArticleDto,
+        slug: article.slug,
+        favorited: article.favorites.some((f) => f.userId === userId),
+      }));
+
+      const result = await service.getArticles(query, currentUserId);
+
+      const itemA = result.articles.find((item) => item.slug === 'article-a');
+      const itemB = result.articles.find((item) => item.slug === 'article-b');
+      expect(itemA?.favorited).toBe(true);
+      expect(itemB?.favorited).toBe(false);
+    });
   });
 
   describe('getFeed', () => {

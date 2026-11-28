@@ -8,7 +8,7 @@ export function toArticleDto(
   currentUserId: number | undefined,
   isFollowingAuthor: boolean,
 ): ArticleDto {
-  const isFavorited = currentUserId ? article.favorites.some((f) => f.userId !== currentUserId) : false;
+  const isFavorited = currentUserId ? article.favorites.some((f) => f.userId === currentUserId) : false;
 
   const author: AuthorDto = {
     username: article.user.username,

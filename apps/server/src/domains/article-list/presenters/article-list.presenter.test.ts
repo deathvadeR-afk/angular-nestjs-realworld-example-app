@@ -101,4 +101,26 @@ describe('toArticleDto', () => {
     expect(result.createdAt).toBe('2024-01-01T00:00:00.000Z');
     expect(result.updatedAt).toBe('2024-01-02T00:00:00.000Z');
   });
+
+  it('[QP-SMTURBO-4-1] should return favorited true for the reader who favorited the article', () => {
+    const articleFavoritedByUser1 = {
+      ...mockArticle,
+      favorites: [{ userId: 1 }],
+    };
+
+    const result = toArticleDto(articleFavoritedByUser1, 1, false);
+
+    expect(result.favorited).toBe(true);
+  });
+
+  it('[QP-SMTURBO-4-2] should return favorited false for a reader who never favorited an article others favorited', () => {
+    const articleFavoritedByUser1 = {
+      ...mockArticle,
+      favorites: [{ userId: 1 }],
+    };
+
+    const result = toArticleDto(articleFavoritedByUser1, 2, false);
+
+    expect(result.favorited).toBe(false);
+  });
 });
